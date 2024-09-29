@@ -1,0 +1,94 @@
+import datetime
+
+class Feedback:
+    def __init__(self, id, responses, date):
+        self.id = id
+        self.responses = responses
+        self.date = date
+
+
+feedback_list = []
+
+
+def create_feedback(responses):
+    id = len(feedback_list) + 1
+    date = datetime.datetime.now()
+    feedback = Feedback(id, responses, date)
+    feedback_list.append(feedback)
+    print("Feedback created successfully!")
+
+
+def read_feedback(id=None):
+    if id:
+        for feedback in feedback_list:
+            if feedback.id == id:
+                print(f"Feedback ID: {feedback.id}")
+                print(f"Responses: {feedback.responses}")
+                print(f"Date: {feedback.date}")
+                return
+        print("Feedback not found.")
+    else:
+        for feedback in feedback_list:
+            print(f"Feedback ID: {feedback.id}")
+            print(f"Responses: {feedback.responses}")
+            print(f"Date: {feedback.date}")
+            print("-" * 20)
+
+
+def update_feedback(id, new_responses):
+    for feedback in feedback_list:
+        if feedback.id == id:
+            feedback.responses = new_responses
+            print("Feedback updated successfully!")
+            return
+    print("Feedback not found.")
+
+
+def delete_feedback(id):
+    global feedback_list
+    feedback_list = [feedback for feedback in feedback_list if feedback.id != id]
+    print("Feedback deleted successfully!")
+
+
+def collect_feedback(questions):
+    responses = {}
+    for question in questions:
+        if question["type"] == "text":
+            response = input(question["text"] + ": ")
+            responses[question["id"]] = response
+        elif question["type"] == "number":
+            while True:
+                try:
+                    response = int(input(question["text"] + ": "))
+                    responses[question["id"]] = response
+                    break
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+        elif question["type"] == "select":
+            print(question["text"] + ":")
+            for i, option in enumerate(question["options"]):
+                print(f"{i + 1}. {option}")
+            while True:
+                try:
+                    response = int(input("Enter your choice: "))
+                    if 1 <= response <= len(question["options"]):
+                        responses[question["id"]] = question["options"][response - 1]
+                        break
+                    else:
+                        print("Invalid choice.")
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+    create_feedback(responses)
+
+
+questions = [
+    {"id": 1, "text": "What is your name?", "type": "text"},
+    {"id": 2, "text": "How satisfied are you with our service (1-5)?", "type": "number"},
+    {"id": 3, "text": "What is your feedback?", "type": "text"},
+    {"id": 4, "text": "How would you rate our website?", "type": "select",
+     "options": ["Excellent", "Good", "Fair", "Poor"]},
+]
+
+collect_feedback(questions)
+
+read_feedback()
